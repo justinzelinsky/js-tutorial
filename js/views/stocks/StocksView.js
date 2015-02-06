@@ -9,14 +9,28 @@ define(['jquery',
     Highcharts,
     StockTemplate) {
 
-    var HomeView = Backbone.View.extend({
+    var StocksView = Backbone.View.extend({
 
         el: $('#container'),
 
         render: function() {
             this.$el.html(StockTemplate);
+            this.highchartContainer = $('#highcharts');
+        },
+
+        events: {
+            "click #graphButton": "graphData"
+        },
+
+        graphData: function() {
+            console.log("Button clicked");
+        },
+
+
+        displayChart: function(data) {
+            console.log(data);
         }
     });
 
-    return HomeView;
+    return StocksView;
 });
