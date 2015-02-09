@@ -2,12 +2,14 @@ define(['jquery',
     'underscore',
     'backbone',
     'highcharts',
-    'text!templates/stocks/stockTemplate.html'
+    'text!templates/stocks/stockTemplate.html',
+    'models/models'
 ], function($,
     _,
     Backbone,
     Highcharts,
-    StockTemplate) {
+    StockTemplate,
+    Models) {
 
     var StocksView = Backbone.View.extend({
 
@@ -23,7 +25,10 @@ define(['jquery',
         },
 
         graphData: function() {
-            console.log("Button clicked");
+            Models.stocks.lookup("AAPL").then(function(StockModel){
+                console.log(StockModel);
+                console.log("Successful lookup");
+            });
         },
 
 
