@@ -1,13 +1,13 @@
 define(['jquery',
     'underscore',
     'backbone',
-    'highcharts',
+    'highstock',
     'text!templates/stocks/stockTemplate.html',
     'models/models'
 ], function($,
     _,
     Backbone,
-    Highcharts,
+    Highstock,
     StockTemplate,
     Models) {
 
@@ -17,7 +17,7 @@ define(['jquery',
 
         render: function() {
             this.$el.html(StockTemplate);
-            this.symbol = $('#symbol');
+            this.symbolInput = $('#symbol');
             this.errorDiv = $('#error');
         },
 
@@ -27,88 +27,61 @@ define(['jquery',
 
         graphData: function() {
             var scope = this;
-            Models.lookupStock(this.symbol.val()).then(function(stockModel) {
-                scope.displayChart(stockModel);
-            }, function(resp) {
-                scope.errorDiv.val("Invalid Stock Symbol Chosen");
+            this.symbol = this.symbolInput.val();
+
+            Models.lookupStock(this.symbol).then(function(stockModel) {
+                stockModel.Dates = _.map(stockModel.Dates, function(date) {
+                    var dateObject = new Date(date);
+                    return Date.UTC(dateObject.getFullYear(), dateObject.getMonth(), dateObject.getDate());
+                });
+                scope.displayChart(scope.extractData(stockModel));
             });
         },
 
-        _fixDate: function(dateIn) {
-            var dat = new Date(dateIn);
-            return Date.UTC(dat.getFullYear(), dat.getMonth(), dat.getDate());
-        },
+        extractData: function(data) {
+            var ohlcSeries = [];
+            var volumeSeries = [];
+            var dates = data.Dates;
+            var ohlcElement = data.Elements[0];
+            var volumeElement = data.Elements[1];
 
-        _getOHLC: function(json) {
-            var dates = json.Dates || [];
-            var elements = json.Elements || [];
-            var chartSeries = [];
-
-            if (elements[0]) {
-
-                for (var i = 0, datLen = dates.length; i < datLen; i++) {
-                    var dat = this._fixDate(dates[i]);
-                    var pointData = [
-                        dat,
-                        elements[0].DataSeries['open'].values[i],
-                        elements[0].DataSeries['high'].values[i],
-                        elements[0].DataSeries['low'].values[i],
-                        elements[0].DataSeries['close'].values[i]
-                    ];
-                    chartSeries.push(pointData);
-                };
+            for (var i = 0; i < dates.length; i++) {
+                var date = dates[i];
+                ohlcSeries.push([date,
+                    ohlcElement.DataSeries['open'].values[i],
+                    ohlcElement.DataSeries['high'].values[i],
+                    ohlcElement.DataSeries['low'].values[i],
+                    ohlcElement.DataSeries['close'].values[i]
+                ]);
+                volumeSeries.push([
+                    date,
+                    volumeElement.DataSeries['volume'].values[i]
+                ]);
             }
-            return chartSeries;
-        },
 
-        _getVolume: function(json) {
-            var dates = json.Dates || [];
-            var elements = json.Elements || [];
-            var chartSeries = [];
-
-            if (elements[1]) {
-
-                for (var i = 0, datLen = dates.length; i < datLen; i++) {
-                    var dat = this._fixDate(dates[i]);
-                    var pointData = [
-                        dat,
-                        elements[1].DataSeries['volume'].values[i]
-                    ];
-                    chartSeries.push(pointData);
-                };
+            return {
+                volume: volumeSeries,
+                ohlc: ohlcSeries
             }
-            return chartSeries;
         },
-
 
         displayChart: function(data) {
-            //console.log(data)
-            // split the data set into ohlc and volume
-            var symbol = "Foo";
-            var ohlc = this._getOHLC(data),
-                volume = this._getVolume(data);
-
-            // set the allowed units for data grouping
             var groupingUnits = [
                 [
-                    'week', // unit name
-                    [1] // allowed multiples
+                    'week', [1]
                 ],
                 [
                     'month', [1, 2, 3, 4, 6]
                 ]
             ];
 
-            // create the chart
             $('#highcharts').highcharts({
-
                 rangeSelector: {
                     selected: 1
-                        //enabled: false
                 },
 
                 title: {
-                    text: symbol + ' Historical Price'
+                    text: this.symbol + ' Historical Price'
                 },
 
                 yAxis: [{
@@ -129,15 +102,15 @@ define(['jquery',
 
                 series: [{
                     type: 'candlestick',
-                    name: symbol,
-                    data: ohlc,
+                    name: this.symbol,
+                    data: data.ohlc,
                     dataGrouping: {
                         units: groupingUnits
                     }
                 }, {
                     type: 'column',
                     name: 'Volume',
-                    data: volume,
+                    data: data.volume,
                     yAxis: 1,
                     dataGrouping: {
                         units: groupingUnits

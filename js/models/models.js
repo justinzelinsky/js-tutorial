@@ -1,6 +1,5 @@
 define(['jquery', 'backbone'], function($, Backbone) {
     var lookup = function(symbol) {
-        console.log(symbol);
         var ajaxOptions = {
             url: "http://dev.markitondemand.com/Api/v2/InteractiveChart/jsonp/",
             jsonp: "callback",
