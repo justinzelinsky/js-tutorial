@@ -13,7 +13,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
                     Elements: [{
                         Symbol: symbol,
                         Type: "price",
-                        Params: ["ohlc"] //ohlc, c = close only
+                        Params: ["ohlc"]
                     }, {
                         Symbol: symbol,
                         Type: "volume"

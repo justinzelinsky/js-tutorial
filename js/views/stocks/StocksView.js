@@ -12,13 +12,10 @@ define(['jquery',
     Models) {
 
     var StocksView = Backbone.View.extend({
-
-        el: $('#container'),
-
         render: function() {
             this.$el.html(StockTemplate);
-            this.symbolInput = $('#symbol');
-            this.errorDiv = $('#error');
+            this.symbolInput = $('#symbol', this.$el);
+            this.errorDiv = $('#error', this.$el);
         },
 
         events: {

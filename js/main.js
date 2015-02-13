@@ -5,8 +5,16 @@ require.config({
         backbone: 'lib/backbone/backbone-min',
         highstock: ['lib/highstock/highstock-min'],
         templates: '../templates'
+    },
+    shim: {
+        'backbone': {
+            deps: ['underscore', 'jquery'],
+            exports: 'Backbone'
+        },
+        'underscore': {
+            exports: '_'
+        }
     }
-
 });
 
 require(['app'], function(App) {
