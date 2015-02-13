@@ -28,6 +28,7 @@ define(['jquery',
         graphData: function() {
             var scope = this;
             this.symbol = this.symbolInput.val();
+            console.log(this.symbol);
 
             Models.lookupStock(this.symbol).then(function(stockModel) {
                 stockModel.Dates = _.map(stockModel.Dates, function(date) {
@@ -76,6 +77,10 @@ define(['jquery',
             ];
 
             $('#highcharts').highcharts({
+                chart: {
+                    width: 800,
+                    height: 500
+                },
                 rangeSelector: {
                     selected: 1
                 },
