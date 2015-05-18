@@ -1,4 +1,4 @@
-define(['backbone', 'views/home/HomeView', 'views/stocks/StocksView'], function(Backbone, HomeView, StocksView) {
+define(['backbone', 'jquery', 'views/home/HomeView', 'views/stocks/StocksView'], function(Backbone, $, HomeView, StocksView) {
     var AppRouter = Backbone.Router.extend({
         routes: {
             'stocks': 'showStocks',

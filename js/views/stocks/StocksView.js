@@ -15,7 +15,6 @@ define(['jquery',
         render: function() {
             this.$el.html(StockTemplate);
             this.symbolInput = $('#symbol', this.$el);
-            this.errorDiv = $('#error', this.$el);
         },
 
         events: {
@@ -24,10 +23,11 @@ define(['jquery',
 
         graphData: function() {
             var scope = this;
+            this.extractData
             this.symbol = this.symbolInput.val();
-            console.log(this.symbol);
 
             Models.lookupStock(this.symbol).then(function(stockModel) {
+                debugger;
                 stockModel.Dates = _.map(stockModel.Dates, function(date) {
                     var dateObject = new Date(date);
                     return Date.UTC(dateObject.getFullYear(), dateObject.getMonth(), dateObject.getDate());
